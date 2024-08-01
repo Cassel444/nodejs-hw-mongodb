@@ -5,7 +5,6 @@ import {
     getContactsById,
     updateContact
 } from "../services/contacts.js";
-import createHttpError from "http-errors";
 
 export const getContactsController = async (req, res, next) => {
 
@@ -24,13 +23,6 @@ export const getContactByIdController = async (req, res, next) => {
 
     const contact = await getContactsById(contactId);
 
-    if (!contact) {
-        next(createHttpError(res.status(404).json({
-            status: 404,
-            message: "Contact not found",
-        })
-        ));
-    }
     res.json({
         status: 200,
         message: `Succesfully found contact with id ${contactId}`,
@@ -38,7 +30,7 @@ export const getContactByIdController = async (req, res, next) => {
     });
 };
 
-export const createContactController = async (req, res) => {
+export const createContactController = async (req, res, next) => {
     const contact = await createContact(req.body);
 
     res.status(201).json({
@@ -53,14 +45,6 @@ export const patchContactController = async (req, res, next) => {
 
     const result = await updateContact(contactId, req.body);
 
-    if (!result) {
-        next(createHttpError(res.status(404).json({
-            status: 404,
-            message: "Contact not found",
-        })
-        ));
-        return;
-    }
     res.status(200).json({
         status: 200,
         message: "Successfully patched a contact!",
@@ -71,14 +55,8 @@ export const patchContactController = async (req, res, next) => {
 export const deleteContactController = async (req, res, next) => {
     const { contactId } = req.params;
 
+    // eslint-disable-next-line no-unused-vars
     const contact = await deleteContact(contactId);
 
-    if (!contact) {
-        next(createHttpError(res.status(404).json({
-            status: 404,
-            message: "Contact not found!",
-        })
-        ));
-    }
     res.status(204).send();
 };
