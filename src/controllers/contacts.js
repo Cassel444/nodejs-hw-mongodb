@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import {
     createContact,
     deleteContact,
@@ -6,7 +7,7 @@ import {
     updateContact
 } from "../services/contacts.js";
 
-export const getContactsController = async (req, res, next) => {
+export const getContactsController = async (req, res) => {
 
     const contacts = await getAllContacts();
 
@@ -22,6 +23,10 @@ export const getContactByIdController = async (req, res, next) => {
     const { contactId } = req.params;
 
     const contact = await getContactsById(contactId);
+
+    if (!contact) {
+        throw (createHttpError(404, "Contact not found"));
+    }
 
     res.json({
         status: 200,
@@ -43,11 +48,18 @@ export const createContactController = async (req, res, next) => {
 export const patchContactController = async (req, res, next) => {
     const { contactId } = req.params;
 
-    const result = await updateContact(contactId, req.body);
+    const result = await updateContact(contactId, req.body, {
+        upsert: true,
+    });
 
-    res.status(200).json({
-        status: 200,
-        message: "Successfully patched a contact!",
+    if (!result) {
+        throw (createHttpError(404, "Contact not found"));
+    }
+    const status = result.isNew ? 201 : 200;
+
+    res.status(status).json({
+        status,
+        message: "Successfully upserted  a contact!",
         data: result.contact,
     });
 };
@@ -55,8 +67,10 @@ export const patchContactController = async (req, res, next) => {
 export const deleteContactController = async (req, res, next) => {
     const { contactId } = req.params;
 
-    // eslint-disable-next-line no-unused-vars
-    const contact = await deleteContact(contactId);
+    const deletedContact = await deleteContact(contactId);
 
-    res.status(204).send();
+    if (!deletedContact) {
+        throw (createHttpError(404, "Contact not found!"));
+    }
+    res.status(204).end();
 };
