@@ -51,7 +51,7 @@ export const createContact = (payload) => {
     return ContactsCollection.create(payload);
 };
 
-export const updateContact = (contactId, payload, userId) => {
+export const updateContact = (contactId, userId, payload) => {
     return ContactsCollection.findOneAndUpdate(
         { _id: contactId, userId },
         payload,

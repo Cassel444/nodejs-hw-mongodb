@@ -14,6 +14,7 @@ import { validateBody } from "../middlewares/validateBody.js";
 import { ctrlWrapper } from "../utils/ctrlWrapper.js";
 import { isValidId } from "../middlewares/isValidId.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { upload } from "../middlewares/multer.js";
 
 
 
@@ -27,9 +28,9 @@ router.get("/", ctrlWrapper(getContactsController));
 
 router.get("/:contactId", isValidId("contactId"), ctrlWrapper(getContactByIdController));
 
-router.post("/", jsonParser, validateBody(createContactSchema), ctrlWrapper(createContactController));
+router.post("/", jsonParser, upload.single("photo"), validateBody(createContactSchema), ctrlWrapper(createContactController));
 
-router.patch("/:contactId", isValidId("contactId"), jsonParser, validateBody(updateContactSchema), ctrlWrapper(patchContactController));
+router.patch("/:contactId", isValidId("contactId"), jsonParser, upload.single("photo"), validateBody(updateContactSchema), ctrlWrapper(patchContactController));
 
 router.delete("/:contactId", isValidId("contactId"), ctrlWrapper(deleteContactController));
 

@@ -9,6 +9,10 @@ import {
 import { parsePaginationParams } from "../utils/parsePaginationParams.js";
 import { parseSortParams } from "../utils/parseSortParams.js";
 import { parseFilterParams } from "../utils/ParseFilterParams.js";
+import { saveFileToUploadDir } from "../utils/saveFileToUploadDir.js";
+import { env } from "../utils/env.js";
+import { saveFileToCloudinary } from "../utils/saveFileToCloudinary.js";
+
 
 export const getContactsController = async (req, res) => {
 
@@ -55,6 +59,12 @@ export const createContactController = async (req, res) => {
         ...req.body,
         userId: req.user._id,
     };
+    const photo = req.file;
+
+    if (photo) {
+        const photoUrl = await saveFileToUploadDir(photo);
+        contact.photo = photoUrl;
+    }
     const createdContact = await createContact(contact);
 
     res.status(201).json({
@@ -67,18 +77,29 @@ export const createContactController = async (req, res) => {
 export const patchContactController = async (req, res, next) => {
     const { contactId } = req.params;
     const userId = req.user._id;
-    const updateData = req.body;
+    const photo = req.file;
 
-    const contact = await updateContact(contactId, updateData, userId);
+    let photoUrl;
 
-    if (contact === null) {
-        throw (createHttpError(404, "Contact not found"));
+    if (photo) {
+        if (env("ENABLE_CLOUDINARY") === "true") {
+            photoUrl = await saveFileToCloudinary(photo);
+        } else {
+            photoUrl = await saveFileToUploadDir(photo);
+        }
+
+    }
+
+    const result = await updateContact(contactId, userId, { ...req.body, photo: photoUrl });
+
+    if (result === null) {
+        next(createHttpError(404, "Contact not found"));
     }
 
     res.status(200).json({
         status: 200,
         message: `Successfully updated the contact for ${req.user.name}!`,
-        data: contact,
+        data: result,
     });
 };
 
@@ -93,3 +114,5 @@ export const deleteContactController = async (req, res, next) => {
     }
     res.status(204).end();
 };
+
+
