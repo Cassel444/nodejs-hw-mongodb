@@ -12,7 +12,7 @@ import { parseFilterParams } from "../utils/ParseFilterParams.js";
 import { saveFileToUploadDir } from "../utils/saveFileToUploadDir.js";
 import { env } from "../utils/env.js";
 import { saveFileToCloudinary } from "../utils/saveFileToCloudinary.js";
-
+import { CLOUDINARY } from "../constants/index.js";
 
 export const getContactsController = async (req, res) => {
 
@@ -55,17 +55,27 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
-    const contact = {
-        ...req.body,
-        userId: req.user._id,
-    };
+
     const photo = req.file;
 
+    let photoUrl;
+
     if (photo) {
-        const photoUrl = await saveFileToCloudinary(photo);
-        contact.photo = photoUrl;
+        if (env(CLOUDINARY.ENABLE_CLOUDINARY) === "true") {
+            photoUrl = await saveFileToCloudinary(photo);
+        } else {
+            photoUrl = await saveFileToUploadDir(photo);
+        }
     }
-    const createdContact = await createContact(contact);
+    const createdContact = await createContact({
+        name: req.body.name,
+        phoneNumber: req.body.phoneNumber,
+        email: req.body.email,
+        isFavorite: req.body.isFavorite,
+        contactType: req.body.contactType,
+        userId: req.user._id,
+        photo: photoUrl,
+    });
 
     res.status(201).json({
         status: 201,
@@ -82,12 +92,11 @@ export const patchContactController = async (req, res, next) => {
     let photoUrl;
 
     if (photo) {
-        if (env("ENABLE_CLOUDINARY") === "true") {
+        if (env(CLOUDINARY.ENABLE_CLOUDINARY) === "true") {
             photoUrl = await saveFileToCloudinary(photo);
         } else {
             photoUrl = await saveFileToUploadDir(photo);
         }
-
     }
 
     const result = await updateContact(contactId, userId, { ...req.body, photo: photoUrl });
