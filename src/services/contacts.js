@@ -1,6 +1,6 @@
-import { ContactsCollection } from "../db/models/contacts.js";
 import { calculatePaginationData } from "../utils/calculatePaginationData.js";
 import { SORT_ORDER } from "../constants/index.js";
+import { ContactsCollection } from "../db/models/contacts.js";
 
 
 export const getAllContacts = async ({
@@ -55,7 +55,7 @@ export const updateContact = (contactId, userId, payload) => {
     return ContactsCollection.findOneAndUpdate(
         { _id: contactId, userId },
         payload,
-        { new: true }); // чи буде повернуто оновлений документ //
+        { new: true });
 };
 
 export const deleteContact = (contactId, userId) => {
