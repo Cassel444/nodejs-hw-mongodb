@@ -9,8 +9,8 @@ export const createContactSchema = Joi.object({
     }),
     phoneNumber: Joi.string().required()
     .pattern(/^\+?[0-9]{10,15}$/),
-    email: Joi.string().email().required(),
-    isFavorite: Joi.boolean().default(false),
+    email: Joi.string().email(),
+    isFavorite: Joi.boolean(),
     contactType: Joi.string().valid("work", "home", "personal")
     .required().messages({
     'any.required': 'Type of number is required',
