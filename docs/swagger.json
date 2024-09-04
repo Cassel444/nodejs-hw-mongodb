@@ -86,10 +86,10 @@
             "in": "query",
             "name": "filter",
             "schema": {
-              "type": "string",
+              "type": "object",
               "additionalProperties": true
             },
-            "description": "Filter criteria for querying contacts."
+            "description": "Additional filter criteria for querying contacts. This field can be used to specify other filters, e.g., isFavourite."
           }
         ],
         "responses": {
@@ -206,11 +206,6 @@
                     "type": "string",
                     "example": "+1234567890"
                   },
-                  "email": {
-                    "description": "The email of the contact",
-                    "type": "string",
-                    "example": "johndoe@gmail.com"
-                  },
                   "contactType": {
                     "description": "Specifies the type of contact",
                     "type": "string",
@@ -221,6 +216,16 @@
                     ],
                     "example": "work",
                     "default": "personal"
+                  },
+                  "isFavorite": {
+                    "description": "Indicates whether the contact is marked as a favorite",
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "email": {
+                    "description": "The email of the contact",
+                    "type": "string",
+                    "example": "johndoe@gmail.com"
                   },
                   "photo": {
                     "description": "The photo of the contact",
@@ -229,52 +234,9 @@
                   }
                 }
               }
-            },
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "phoneNumber",
-                  "contactType"
-                ],
-                "properties": {
-                  "name": {
-                    "description": "The name of the contact",
-                    "type": "string",
-                    "example": "John Doe"
-                  },
-                  "phoneNumber": {
-                    "description": "The phone number of the contact",
-                    "type": "string",
-                    "example": "+1234567890"
-                  },
-                  "email": {
-                    "description": "The email of the contact",
-                    "type": "string",
-                    "example": "johndoe@gmail.com"
-                  },
-                  "isFavorite": {
-                    "description": "Indicates whether the contact is marked as a favorite",
-                    "type": "boolean",
-                    "example": true,
-                    "default": false
-                  },
-                  "contactType": {
-                    "description": "Specifies the type of contact",
-                    "type": "string",
-                    "enum": [
-                      "work",
-                      "home",
-                      "personal"
-                    ],
-                    "example": "work",
-                    "default": "personal"
-                  }
-                }
-              }
             }
-          }
+          },
+          "description": "Details to create a contact"
         },
         "responses": {
           "201": {
@@ -1081,6 +1043,7 @@
           "_id",
           "name",
           "phoneNumber",
+          "isFavourite",
           "contactType"
         ],
         "properties": {
@@ -1108,8 +1071,7 @@
           "isFavorite": {
             "description": "Indicates whether the contact is marked as a favorite",
             "type": "boolean",
-            "example": false,
-            "default": false
+            "example": false
           },
           "contactType": {
             "description": "Specifies the type of contact",

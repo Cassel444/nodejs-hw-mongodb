@@ -34,9 +34,9 @@ parameters:
   - in: query
     name: filter
     schema:
-      type: string
+      type: object
       additionalProperties: true
-    description: Filter criteria for querying contacts.
+    description: 'Additional filter criteria for querying contacts. This field can be used to specify other filters, e.g., isFavourite.'
 responses:
   '200':
     description: Successfully found contacts
