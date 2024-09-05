@@ -37,7 +37,7 @@ parameters:
       type: string
       enum: [true, false]
       example: true
-    description: 'This field allows you to select your favorite contacts'
+    description: 'This field allows to select favorite contacts'
 responses:
   '200':
     description: Successfully found contacts
