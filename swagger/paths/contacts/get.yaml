@@ -32,11 +32,12 @@ parameters:
       example: 'asc'
     description: Order to sort the results. Can be 'asc' or 'desc'.
   - in: query
-    name: filter
+    name: isFavorite
     schema:
-      type: object
-      additionalProperties: true
-    description: 'Additional filter criteria for querying contacts. This field can be used to specify other filters, e.g., isFavourite.'
+      type: string
+      enum: [true, false]
+      example: true
+    description: 'This field allows you to select your favorite contacts'
 responses:
   '200':
     description: Successfully found contacts
